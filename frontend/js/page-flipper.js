@@ -3,53 +3,59 @@
  */
 
 (function () {
-	$.widget("PageFlipper", {
+	$.widget("tl.pageFlipper", {
 		options: {
 			startPage: 0,
 			startEmpty: true,
-			startHeight: "5em"
+			startHeight: 40
 		},
 
-		currentPage: 0,
+		currentPage: -1,
 		pageList: [],
 		blankpage: null,
 		numPage: 0,
 
 		_create: function (_options) {
-			this.currentPage = this.options.startPage;
-			this.blankpage = $("<section style='height:" + this.options.startHeight + ";' class='pf-page pf-blank'></section>");
 			var jthis = this.element;
 			var _this = this;
 
 			jthis.addClass("pf-frame");
 
-			jthis.children().each(function(_index, _elem) {
+			if (this.options.startEmpty)
+				jthis.height(this.options.startHeight);
+
+			jthis.children().each(function (_index, _elem) {
 				cjthis = $(this);
-				if (startEmpty || _index != _this.options.startPage)
+				if (_this.options.startEmpty || _index != _this.options.startPage)
 					cjthis.addClass("pf-hidden");
 
 				cjthis.addClass("pf-page");
-				_this.pageList.append(cjthis);
+				_this.pageList.push(cjthis);
 				_this.numPage ++;
 			});
 
 			if (this.options.startEmpty)
-				jthis.flip(this.currentPage);
-		};
+				this.flip(this.options.startPage);
+			else
+				this.options.startPage;
+		},
 
 		destroy: function () {
 			$.Widget.prototype.destroy.call(this);
-		}
+		},
 
 		flip: function (_page, _endFunc) {
-			if (_page >= numPage)
+			if (_page >= this.numPage)
 				return;
 
+			var nostart = this.currentPage == -1;
 			var frame = this.element;
 			var inPage = this.pageList[_page];
 			var outPage = this.pageList[this.currentPage];
 
-			var oh = outPage.outerHeight();
+			var self = this;
+
+			var oh = nostart? this.options.startHeight : outPage.outerHeight();
 			var ih = inPage.outerHeight();
 			var pad = frame.outerHeight() - oh;
 
@@ -58,37 +64,40 @@
 
 			frame.height(oh);
 
-			outPage.animate({
-				opacity: 0
-			}, {
-				duration: 200,
-				step: function(_now, _fx) {
-					$(this).css("-webkit-transform", "rotateY(" + ((1-_now)*180) + "deg)");
-				},
-				complete: function() {
-					outPage.addClass("hidden");
-				}
-			});
+			if (!nostart) {
+				outPage.animate({
+					opacity: 0
+				}, {
+					duration: 200,
+					step: function (_now, _fx) {
+						$(this).css("-webkit-transform", "rotateY(" + ((1-_now)*180) + "deg)");
+					},
+					complete: function () {
+						outPage.addClass("pf-hidden");
+					}
+				});
+			}
 
 			frame.animate({
 				height: ih
-			}, 200, function() {
+			}, 200, function () {
 				if (_endFunc)
 					_endFunc();
 
 				frame.height("auto");
-				inPage.removeClass("hidden");
+				inPage.removeClass("pf-hidden");
 				inPage.css("opacity", 0);
+				self.currentPage = _page;
 
 				inPage.animate({
 					opacity: 1
 				}, {
 					duration: 200,
-					step: function(_now, _fx) {
+					step: function (_now, _fx) {
 						$(this).css("-webkit-transform", "rotateY(" + ((1-_now)*-180) + "deg)");
 					}
 				});
 			});
-		};
+		}
 	});
 }());
