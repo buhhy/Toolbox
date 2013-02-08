@@ -7,7 +7,8 @@
 		options: {
 			startPage: 0,
 			startEmpty: true,
-			startHeight: 40
+			startHeight: 40,
+			autoStart: true
 		},
 
 		currentPage: -1,
@@ -21,9 +22,6 @@
 
 			jthis.addClass("pf-frame");
 
-			if (this.options.startEmpty)
-				jthis.height(this.options.startHeight);
-
 			jthis.children().each(function (_index, _elem) {
 				cjthis = $(this);
 				if (_this.options.startEmpty || _index != _this.options.startPage)
@@ -34,10 +32,17 @@
 				_this.numPage ++;
 			});
 
-			if (this.options.startEmpty)
-				this.flip(this.options.startPage);
-			else
-				this.options.startPage;
+			if (this.options.startEmpty) {
+				setTimeout(function () {
+					jthis.height(_this.options.startHeight);
+				}, 1);
+			}
+
+			if (this.options.startEmpty) {
+				if (this.options.autoStart)
+					this.flip(this.options.startPage);
+			} else
+				this.currentPage = this.options.startPage;
 		},
 
 		destroy: function () {
