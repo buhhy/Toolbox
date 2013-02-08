@@ -1,0 +1,23 @@
+.pf-frame {
+	position: relative;
+	-webkit-box-sizing: border-box;
+	-webkit-perspective: 900px;
+}
+
+.pf-frame .pf-page {
+	width: 100%;
+
+	-webkit-box-sizing: border-box;
+	-webkit-backface-visibility: hidden;
+}
+
+.pf-frame .pf-page.pf-blank {
+	height: 5em;
+}
+
+.pf-frame .pf-page.pf-hidden {
+	position: absolute;
+	visibility: hidden;
+	opacity: 0;
+	top: 0;
+}
